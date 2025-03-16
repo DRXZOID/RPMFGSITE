@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, session
 from flask_login import login_required, current_user
 from app.models import Post, Comment, Category, Permission
 from app import db
@@ -158,6 +158,13 @@ def edit_post(id):
     
     categories = Category.query.all()
     return render_template('main/edit_post.html', post=post, categories=categories)
+
+@bp.route('/language/<lang_code>')
+def set_language(lang_code):
+    # Validate language code
+    if lang_code in ['en', 'ua', 'ru']:
+        session['language'] = lang_code
+    return redirect(request.referrer or url_for('main.index'))
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}

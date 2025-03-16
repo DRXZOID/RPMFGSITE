@@ -1221,4 +1221,33 @@
     .form-actions .btn {
         width: 100%;
     }
+}
+
+.language-selector {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+}
+
+.language-selector select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.language-selector select:hover {
+    border-color: #aaa;
+}
+
+@media (max-width: 768px) {
+    .language-selector {
+        position: static;
+        text-align: center;
+        margin: 1rem 0;
+    }
 } 

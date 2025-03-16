@@ -30,6 +30,22 @@
     {% endwith %}
     
     <main>
+        <div class="language-selector">
+            <select onchange="window.location.href=this.value">
+                <option value="{{ url_for('main.set_language', lang_code='en') }}" 
+                        {% if session.get('language', 'en') == 'en' %}selected{% endif %}>
+                    English
+                </option>
+                <option value="{{ url_for('main.set_language', lang_code='ua') }}"
+                        {% if session.get('language') == 'ua' %}selected{% endif %}>
+                    Українська
+                </option>
+                <option value="{{ url_for('main.set_language', lang_code='ru') }}"
+                        {% if session.get('language') == 'ru' %}selected{% endif %}>
+                    Русский
+                </option>
+            </select>
+        </div>
         {% block content %}{% endblock %}
     </main>
 </body>

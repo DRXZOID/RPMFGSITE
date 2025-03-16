@@ -13,3 +13,6 @@ mysqlclient==2.2.1      # MySQL
 
 # Production server
 gunicorn==20.1.0 
+
+# Internationalization
+Flask-Babel==3.1.0 
