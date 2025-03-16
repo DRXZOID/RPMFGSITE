@@ -7,7 +7,7 @@ A modern, Flask-based bulletin board system with role-based permissions, multi-l
 ### Core Features
 - User registration and authentication
 - Role-based authorization system
-- Multi-language support (EN, ES, FR, DE, RU, ZH)
+- Multi-language support (EN, UA, RU)
 - Post creation and management
 - Comment system
 - Category organization
