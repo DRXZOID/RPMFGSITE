@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="edit-role-container">
+    <div class="edit-role-header">
+        <h1>Edit Role</h1>
+        <a href="{{ url_for('admin.manage_roles') }}" class="btn btn-secondary">Back to Roles</a>
+    </div>
+
+    <div class="edit-role-form-container">
+        <form method="POST" class="edit-role-form">
+            <div class="form-group">
+                <label for="name">Role Name</label>
+                <input type="text" id="name" name="name" value="{{ role.name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Permissions</label>
+                <div class="permissions-grid">
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_read" name="permissions" 
+                               value="{{ Permission.READ }}"
+                               {% if role.permissions and Permission.READ %} checked {% endif %}>
+                        <label for="perm_read">Read</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_comment" name="permissions" 
+                               value="{{ Permission.COMMENT }}"
+                               {% if role.permissions and Permission.COMMENT %} checked {% endif %}>
+                        <label for="perm_comment">Comment</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_write" name="permissions" 
+                               value="{{ Permission.WRITE }}"
+                               {% if role.permissions and Permission.WRITE %} checked {% endif %}>
+                        <label for="perm_write">Write Posts</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_moderate" name="permissions" 
+                               value="{{ Permission.MODERATE }}"
+                               {% if role.permissions and Permission.MODERATE %} checked {% endif %}>
+                        <label for="perm_moderate">Moderate</label>
+                    </div>
+                    <div class="permission-item">
+                        <input type="checkbox" id="perm_admin" name="permissions" 
+                               value="{{ Permission.ADMIN }}"
+                               {% if role.permissions and Permission.ADMIN %} checked {% endif %}>
+                        <label for="perm_admin">Admin</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

@@ -1,33 +1,80 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Bulletin Board</h1>
-    
-    <div class="categories">
-        <h2>Categories</h2>
-        <ul>
-            {% for category in categories %}
-                <li><a href="{{ url_for('main.index', category_id=category.id) }}">{{ category.name }}</a></li>
-            {% endfor %}
-        </ul>
+<div class="main-container">
+    <!-- Header Section -->
+    <div class="page-header">
+        <h1>Bulletin Board</h1>
+        {% if current_user.is_authenticated and current_user.has_permission(Permission.WRITE) %}
+        <a href="{{ url_for('main.create_post') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create Post
+        </a>
+        {% endif %}
     </div>
 
-    <div class="posts">
-        {% for post in posts.items %}
-            <article>
-                <h2><a href="{{ url_for('main.post', id=post.id) }}">{{ post.title }}</a></h2>
-                <p>By {{ post.author.username }} in {{ post.category.name }}</p>
-                <p>{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
-            </article>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Posts Grid -->
+    <div class="posts-grid">
+        {% for post in posts %}
+        <div class="post-card">
+            {% if post.image_url %}
+            <div class="post-image">
+                <img src="{{ url_for('static', filename='uploads/' + post.image_url) }}" 
+                     alt="Post image">
+            </div>
+            {% endif %}
+            
+            <div class="post-content">
+                <div class="post-category">
+                    <span class="category-badge">{{ post.category.name }}</span>
+                </div>
+                
+                <h2 class="post-title">
+                    <a href="{{ url_for('main.post', id=post.id) }}">{{ post.title }}</a>
+                </h2>
+                
+                <div class="post-meta">
+                    <span class="author">
+                        <i class="fas fa-user"></i>
+                        {{ post.author.username }}
+                    </span>
+                    <span class="date">
+                        <i class="fas fa-calendar"></i>
+                        {{ post.timestamp.strftime('%Y-%m-%d') }}
+                    </span>
+                    <span class="comments">
+                        <i class="fas fa-comments"></i>
+                        {{ post.comments.count() }} comments
+                    </span>
+                </div>
+                
+                <div class="post-excerpt">
+                    {{ post.content[:200] + '...' if post.content|length > 200 else post.content }}
+                </div>
+                
+                <div class="post-footer">
+                    <a href="{{ url_for('main.post', id=post.id) }}" class="btn btn-secondary">
+                        Read More
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="no-posts">
+            <p>No posts yet. Be the first to create one!</p>
+            {% if current_user.is_authenticated and current_user.has_permission(Permission.WRITE) %}
+            <a href="{{ url_for('main.create_post') }}" class="btn btn-primary">Create Post</a>
+            {% endif %}
+        </div>
         {% endfor %}
     </div>
-
-    <div class="pagination">
-        {% if posts.has_prev %}
-            <a href="{{ url_for('main.index', page=posts.prev_num) }}">Previous</a>
-        {% endif %}
-        {% if posts.has_next %}
-            <a href="{{ url_for('main.index', page=posts.next_num) }}">Next</a>
-        {% endif %}
-    </div>
+</div>
 {% endblock %} 

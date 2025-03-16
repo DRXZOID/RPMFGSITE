@@ -7,16 +7,23 @@ from app import db, login_manager
 def load_user(id):
     return User.query.get(int(id))
 
+class Role(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    permissions = db.Column(db.Integer)
+    users = db.relationship('User', backref='role', lazy='dynamic')
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     is_admin = db.Column(db.Boolean, default=False)
-    posts = db.relationship('Post', backref='author', lazy=True)
-    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
+    active = db.Column(db.Boolean, default=True)
     avatar = db.Column(db.String(200))
     bio = db.Column(db.Text)
+    role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
+    posts = db.relationship('Post', backref='author', lazy=True)
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
 
     def set_password(self, password):
@@ -26,7 +33,29 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def has_permission(self, permission):
-        return self.role is not None and (self.role.permissions & permission) == permission
+        # If user is admin, they have all permissions
+        if self.is_admin:
+            return True
+        # If user has no role, they have no permissions
+        if self.role is None:
+            return False
+        # Check if the user's role has the requested permission
+        return (self.role.permissions & permission) == permission
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
+        return self.active
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return str(self.id)
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -50,12 +79,6 @@ class Comment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
 
-class Role(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), unique=True)
-    permissions = db.Column(db.Integer)
-    users = db.relationship('User', backref='role', lazy='dynamic')
-
 # Add permissions constants
 class Permission:
     READ = 1
@@ -77,4 +100,13 @@ def init_roles():
             role = Role(name=role_name)
         role.permissions = sum(role_permissions)
         db.session.add(role)
-    db.session.commit() 
+    db.session.commit()
+
+class Activity(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    action = db.Column(db.String(128), nullable=False)
+    details = db.Column(db.String(256))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='activities') 
