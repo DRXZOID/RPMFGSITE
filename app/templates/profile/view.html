@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile">
+    <h1>{{ user.username }}'s Profile</h1>
+    
+    {% if user.avatar %}
+    <img src="{{ url_for('static', filename='uploads/' + user.avatar) }}" alt="Profile picture" class="avatar">
+    {% endif %}
+    
+    <div class="bio">
+        <h2>About</h2>
+        <p>{{ user.bio or "No bio provided." }}</p>
+    </div>
+
+    {% if user == current_user %}
+    <a href="{{ url_for('profile.edit_profile') }}" class="button">Edit Profile</a>
+    {% endif %}
+
+    <div class="user-posts">
+        <h2>Recent Posts</h2>
+        {% for post in user.posts %}
+        <article>
+            <h3><a href="{{ url_for('main.post', id=post.id) }}">{{ post.title }}</a></h3>
+            <p>Posted on {{ post.timestamp.strftime('%Y-%m-%d') }}</p>
+        </article>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

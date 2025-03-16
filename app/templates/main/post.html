@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<article class="post">
+    <h1>{{ post.title }}</h1>
+    
+    {% if post.image_url %}
+    <img src="{{ url_for('static', filename='uploads/' + post.image_url) }}" alt="Post image" class="post-image">
+    {% endif %}
+    
+    <div class="post-content">
+        {{ post.content }}
+    </div>
+    
+    <div class="post-meta">
+        <p>By <a href="{{ url_for('profile.view_profile', username=post.author.username) }}">
+            {{ post.author.username }}</a> in {{ post.category.name }}</p>
+        <p>Posted on {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+    </div>
+
+    {% if current_user.has_permission(Permission.COMMENT) %}
+    <div class="comment-form">
+        <h3>Add a Comment</h3>
+        <form action="{{ url_for('main.add_comment', id=post.id) }}" method="post">
+            <textarea name="content" required></textarea>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="comments">
+        <h3>Comments</h3>
+        {% for comment in post.comments %}
+        <div class="comment">
+            <p>{{ comment.content }}</p>
+            <p class="comment-meta">
+                By {{ comment.author.username }} on {{ comment.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                {% if current_user == comment.author or current_user.has_permission(Permission.MODERATE) %}
+                <form action="{{ url_for('main.delete_comment', id=comment.id) }}" method="post" class="inline">
+                    <button type="submit" class="delete-btn">Delete</button>
+                </form>
+                {% endif %}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</article>
+{% endblock %} 
