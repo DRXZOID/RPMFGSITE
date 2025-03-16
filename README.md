@@ -61,8 +61,8 @@ A modern, Flask-based bulletin board system with role-based permissions and a re
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/bulletin-board.git
-cd bulletin-board
+git clone https://github.com/DRXZOID/RPMFGSITE
+cd RPMFGSITE
 ```
 
 2. Create and activate a virtual environment:
