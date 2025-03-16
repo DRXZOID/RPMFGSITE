@@ -1,19 +1,24 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_required, current_user
 from app.models import Post, Comment, Category, Permission
 from app import db
+from werkzeug.utils import secure_filename
+import os
 
 bp = Blueprint('main', __name__)
 
 @bp.route('/')
 def index():
     posts = Post.query.order_by(Post.timestamp.desc()).all()
-    return render_template('main/index.html', posts=posts, Permission=Permission)
+    return render_template('main/index.html', posts=posts)
 
 @bp.route('/post/<int:id>')
 def post(id):
     post = Post.query.get_or_404(id)
-    return render_template('main/post.html', post=post, Permission=Permission)
+    return render_template('main/post.html', 
+                         post=post, 
+                         Comment=Comment,  # Pass the Comment model
+                         Permission=Permission)
 
 @bp.route('/create', methods=['GET', 'POST'])
 @login_required
@@ -76,12 +81,93 @@ def add_comment(id):
 @login_required
 def delete_comment(id):
     comment = Comment.query.get_or_404(id)
-    if current_user == comment.author or current_user.has_permission(Permission.MODERATE):
-        db.session.delete(comment)
-        db.session.commit()
-    return redirect(url_for('main.post', id=comment.post_id))
+    if not current_user.is_admin and current_user.id != comment.author.id:
+        flash('You do not have permission to delete this comment.')
+        return redirect(url_for('main.post', id=comment.post_id))
+    
+    post_id = comment.post_id
+    db.session.delete(comment)
+    db.session.commit()
+    flash('Comment deleted.')
+    return redirect(url_for('main.post', id=post_id))
 
-# Add this context processor to make Permission available to all templates
+@bp.route('/post/<int:id>/delete', methods=['POST'])
+@login_required
+def delete_post(id):
+    post = Post.query.get_or_404(id)
+    if not current_user.is_admin and current_user.id != post.author.id:
+        flash('You do not have permission to delete this post.')
+        return redirect(url_for('main.post', id=id))
+    
+    # Delete associated comments first
+    Comment.query.filter_by(post_id=id).delete()
+    
+    # Delete the post
+    db.session.delete(post)
+    db.session.commit()
+    flash('Post deleted.')
+    return redirect(url_for('main.index'))
+
+@bp.route('/post/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_post(id):
+    post = Post.query.get_or_404(id)
+    
+    # Check if user has permission to edit
+    if not current_user.is_admin and current_user.id != post.author.id:
+        flash('You do not have permission to edit this post.')
+        return redirect(url_for('main.post', id=id))
+    
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        category_id = request.form.get('category_id')
+        
+        if not all([title, content, category_id]):
+            flash('Please fill out all required fields.')
+            return redirect(url_for('main.edit_post', id=id))
+        
+        post.title = title
+        post.content = content
+        post.category_id = category_id
+        
+        # Handle image upload if present
+        if 'image' in request.files:
+            file = request.files['image']
+            if file and file.filename:
+                if allowed_file(file.filename):
+                    # Delete old image if it exists
+                    if post.image_url:
+                        try:
+                            old_image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], post.image_url)
+                            if os.path.exists(old_image_path):
+                                os.remove(old_image_path)
+                        except Exception as e:
+                            current_app.logger.error(f"Error deleting old image: {e}")
+                    
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+                    post.image_url = filename
+                else:
+                    flash('Invalid file type.')
+                    return redirect(url_for('main.edit_post', id=id))
+        
+        db.session.commit()
+        flash('Your post has been updated!')
+        return redirect(url_for('main.post', id=id))
+    
+    categories = Category.query.all()
+    return render_template('main/edit_post.html', post=post, categories=categories)
+
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Add this context processor to make models available to all templates
 @bp.app_context_processor
-def inject_permissions():
-    return dict(Permission=Permission) 
+def inject_models():
+    return dict(
+        Comment=Comment,
+        Permission=Permission
+    ) 
