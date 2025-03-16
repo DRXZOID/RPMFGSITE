@@ -38,7 +38,7 @@
                 </div>
                 
                 <h2 class="post-title">
-                    <a href="{{ url_for('main.post', id=post.id) }}">{{ post.title }}</a>
+                    <a href="{{ url_for('main.post', post_id=post.id) }}">{{ post.title }}</a>
                 </h2>
                 
                 <div class="post-meta">
@@ -48,11 +48,11 @@
                     </span>
                     <span class="date">
                         <i class="fas fa-calendar"></i>
-                        {{ post.timestamp.strftime('%Y-%m-%d') }}
+                        {{ post.created_at.strftime('%Y-%m-%d') }}
                     </span>
                     <span class="comments">
                         <i class="fas fa-comments"></i>
-                        {{ post.comments.count() }} comments
+                        {{ post.comments|length }} comments
                     </span>
                 </div>
                 
@@ -61,7 +61,7 @@
                 </div>
                 
                 <div class="post-footer">
-                    <a href="{{ url_for('main.post', id=post.id) }}" class="btn btn-secondary">
+                    <a href="{{ url_for('main.post', post_id=post.id) }}" class="btn btn-secondary">
                         Read More
                     </a>
                 </div>

@@ -1,7 +1,22 @@
+"""
+Admin routes module.
+
+This module handles administrative functions including user management,
+content moderation, and site settings. Access is restricted to users
+with admin privileges.
+
+Routes:
+    - /admin: Admin dashboard
+    - /admin/users: User management
+    - /admin/posts: Post management
+    - /admin/categories: Category management
+    - /admin/settings: Site settings
+"""
+
+from functools import wraps
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from app.models import Category, User, Post, Comment, db, Role, Permission, Activity
-from functools import wraps
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -18,6 +33,12 @@ def admin_required(f):
 @login_required
 @admin_required
 def dashboard():
+    """
+    Display admin dashboard.
+
+    Returns:
+        rendered_template: Admin dashboard with overview statistics
+    """
     # Get statistics
     stats = {
         'total_users': User.query.count(),
