@@ -1,0 +1,127 @@
+[MASTER]
+# Python code to execute, usually for sys.path manipulation such as pygtk.require()
+init-hook='import sys; sys.path.append(".")'
+
+# Add files or directories to the blacklist. They should be base names, not paths.
+ignore=CVS,.git,migrations,venv,env
+
+# Add any Python module names here where you want to disable all warnings.
+disable=C0111
+
+# Use multiple processes to speed up Pylint (use "0" for auto)
+jobs=0
+
+[MESSAGES CONTROL]
+# Disable specific warnings
+disable=
+    C0111,  # missing-docstring (we've added them where needed)
+    C0103,  # invalid-name (for short variable names)
+    R0903,  # too-few-public-methods (common in Flask models)
+    W0511,  # fixme (allows TODO comments)
+    R0913,  # too-many-arguments
+    R0914,  # too-many-locals
+    R1702,  # too-many-nested-blocks
+    R1735,  # too-many-statements
+    W0703,  # broad-except
+    W0621,  # redefined-outer-name (common with Flask routes)
+    C0111,  # missing-docstring (redundant with sphinx)
+    C0412,  # ungrouped-imports
+    C0303,  # too-many-lines
+    C0304,  # too-many-ancestors
+    R0401,  # cyclic-import (handled by Flask's factory pattern)
+    W0613,  # unused-argument (common in Flask routes)
+    W0622,  # redundant-keyword-arg
+    W1309,  # too-many-function-args
+[REPORTS]
+# Set the output format. Available formats: text, parseable, colorized, html
+output-format=colorized
+
+# Include a brief explanation of each error
+msg-template={path}:{line}: [{msg_id}({symbol}), {obj}] {msg}
+
+[FORMAT]
+# Maximum number of characters on a single line.
+max-line-length=120
+
+# Maximum number of lines in a module
+max-module-lines=2000
+
+# String used as indentation unit. This is usually "    " (4 spaces) or "\t" (1 tab).
+indent-string='    '
+
+[BASIC]
+# Regular expression which should only match function or class names
+function-rgx=[a-z_][a-z0-9_]{2,50}$
+class-rgx=[A-Z_][a-zA-Z0-9_]+$
+
+# Good variable names which should always be accepted
+good-names=i,j,k,ex,Run,_,id,bp,db
+
+[SIMILARITIES]
+# Minimum lines number of a similarity
+min-similarity-lines=4
+
+# Ignore imports when computing similarities
+ignore-imports=yes
+
+[TYPECHECK]
+# List of module names for which member attributes should not be checked
+ignored-modules=numpy,tensorflow,torch,cv2,flask_sqlalchemy,sqlalchemy
+
+# List of classes names for which member attributes should not be checked
+ignored-classes=SQLObject,SQLAlchemy,scoped_session,Model
+
+[VARIABLES]
+# A regular expression matching the name of dummy variables
+dummy-variables-rgx=_$|dummy
+
+# List of additional names to consider as builtins
+additional-builtins=
+
+[MISCELLANEOUS]
+# List of note tags to take into consideration
+notes=FIXME,XXX,TODO
+
+[IMPORTS]
+# Allow wildcard imports from modules that define __all__
+allow-wildcard-with-all=no
+
+[DESIGN]
+# Maximum number of arguments for function / method
+max-args=10
+
+# Maximum number of locals for function / method body
+max-locals=20
+
+# Maximum number of return / yield for function / method body
+max-returns=6
+
+# Maximum number of branch for function / method body
+max-branches=12
+
+# Maximum number of statements in function / method body
+max-statements=50
+
+# Maximum number of parents for a class (see R0901).
+max-parents=7
+
+# Maximum number of attributes for a class (see R0902).
+max-attributes=10
+
+# Minimum number of public methods for a class (see R0903).
+min-public-methods=0
+
+# Maximum number of public methods for a class (see R0904).
+max-public-methods=20
+
+[CLASSES]
+# List of method names used to declare (i.e. assign) instance attributes.
+defining-attr-methods=__init__,__new__,setUp
+
+# List of valid names for the first argument in a class method.
+valid-classmethod-first-arg=cls
+
+# List of valid names for the first argument in a metaclass class method.
+valid-metaclass-classmethod-first-arg=mcs
+
+[EXCEPTIONS]

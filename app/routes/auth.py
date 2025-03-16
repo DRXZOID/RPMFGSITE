@@ -1,3 +1,17 @@
+"""
+Authentication routes module.
+
+This module handles user authentication including login, logout, registration,
+and password reset functionality. It manages user sessions and security.
+
+Routes:
+    - /login: User login
+    - /logout: User logout
+    - /register: New user registration
+    - /reset-password: Password reset
+    - /confirm-email: Email confirmation
+"""
+
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from app.models import User, db
@@ -25,6 +39,12 @@ def register():
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Handle user login.
+
+    Returns:
+        rendered_template: Login form on GET, redirects on successful POST
+    """
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -39,5 +59,11 @@ def login():
 @bp.route('/logout')
 @login_required
 def logout():
+    """
+    Handle user logout.
+
+    Returns:
+        redirect: Redirects to home page after logging out
+    """
     logout_user()
     return redirect(url_for('main.index')) 

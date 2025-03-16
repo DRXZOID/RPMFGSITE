@@ -24,7 +24,7 @@ class User(UserMixin, db.Model):
     bio = db.Column(db.Text)
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
     posts = db.relationship('Post', backref='author', lazy=True)
-    comments = db.relationship('Comment', backref='author', lazy='dynamic')
+    comments = db.relationship('Comment', backref='author', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -57,26 +57,84 @@ class User(UserMixin, db.Model):
     def get_id(self):
         return str(self.id)
 
-class Category(db.Model):
+class Permission(db.Model):
+    """
+    Permission model for defining user access levels.
+    
+    Attributes:
+        id (int): Primary key for the permission
+        name (str): Name of the permission
+        description (str): Description of what the permission allows
+        created_at (datetime): Timestamp of when the permission was created
+        updated_at (datetime): Timestamp of when the permission was last updated
+    """
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), unique=True, nullable=False)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    description = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class Category(db.Model):
+    """
+    Category model for organizing posts.
+    
+    Attributes:
+        id (int): Primary key for the category
+        name (str): Name of the category (unique)
+        description (str): Optional description of the category
+        created_at (datetime): Timestamp of when the category was created
+        updated_at (datetime): Timestamp of when the category was last updated
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    description = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Define the relationship here only
     posts = db.relationship('Post', backref='category', lazy=True)
 
 class Post(db.Model):
+    """
+    Post model for blog posts or articles.
+    
+    Attributes:
+        id (int): Primary key for the post
+        title (str): Title of the post
+        content (str): Main content of the post
+        created_at (datetime): Timestamp of when the post was created
+        updated_at (datetime): Timestamp of when the post was last updated
+        author_id (int): Foreign key to the User model
+        category_id (int): Foreign key to the Category model
+    """
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(140), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
-    image_url = db.Column(db.String(200))
-    comments = db.relationship('Comment', backref='post', lazy='dynamic')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    
+    # Remove the category relationship since it's defined in Category model
+    comments = db.relationship('Comment', backref='post', lazy=True, cascade='all, delete-orphan')
 
 class Comment(db.Model):
+    """
+    Comment model for post comments.
+    
+    Attributes:
+        id (int): Primary key for the comment
+        content (str): Content of the comment
+        created_at (datetime): Timestamp of when the comment was created
+        updated_at (datetime): Timestamp of when the comment was last updated
+        author_id (int): Foreign key to the User model
+        post_id (int): Foreign key to the Post model
+    """
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
 
 # Add permissions constants

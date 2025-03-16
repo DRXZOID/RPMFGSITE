@@ -37,11 +37,11 @@
                 <div class="post-details">
                     <span class="post-date">
                         <i class="fas fa-calendar"></i>
-                        {{ post.timestamp.strftime('%B %d, %Y') }}
+                        {{ post.created_at.strftime('%B %d, %Y') }}
                     </span>
                     <span class="post-comments">
                         <i class="fas fa-comments"></i>
-                        {{ post.comments.count() }} comments
+                        {{ comment_count }} comments
                     </span>
                 </div>
             </div>
@@ -61,11 +61,11 @@
 
     <!-- Comments Section -->
     <section class="comments-section">
-        <h2>Comments ({{ post.comments.count() }})</h2>
+        <h2>Comments ({{ comment_count }})</h2>
 
         {% if current_user.is_authenticated and current_user.has_permission(Permission.COMMENT) %}
         <div class="comment-form-container">
-            <form method="POST" action="{{ url_for('main.add_comment', id=post.id) }}" class="comment-form">
+            <form method="POST" action="{{ url_for('main.add_comment', post_id=post.id) }}" class="comment-form">
                 <div class="form-group">
                     <textarea name="content" rows="3" required 
                               placeholder="Write your comment here..."></textarea>
@@ -76,7 +76,7 @@
         {% endif %}
 
         <div class="comments-list">
-            {% for comment in post.comments.order_by(Comment.timestamp.desc()).all() %}
+            {% for comment in post.comments|sort(attribute='created_at', reverse=True) %}
             <div class="comment">
                 <div class="comment-header">
                     <div class="comment-author">
@@ -89,7 +89,7 @@
                         <span class="author-name">{{ comment.author.username }}</span>
                     </div>
                     <span class="comment-date">
-                        {{ comment.timestamp.strftime('%B %d, %Y %H:%M') }}
+                        {{ comment.created_at.strftime('%B %d, %Y %H:%M') }}
                     </span>
                 </div>
                 <div class="comment-content">

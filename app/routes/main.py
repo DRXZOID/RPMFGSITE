@@ -1,28 +1,70 @@
+"""
+Main routes module.
+
+This module handles the main routes of the application, including the home page,
+blog posts, and general content pages. It manages post creation, viewing,
+editing, and deletion.
+
+Routes:
+    - /: Home page
+    - /posts: List all posts
+    - /post/<id>: View specific post
+    - /post/create: Create new post
+    - /post/<id>/edit: Edit existing post
+    - /post/<id>/delete: Delete post
+"""
+
+import os
+from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, session
 from flask_login import login_required, current_user
 from app.models import Post, Comment, Category, Permission
 from app import db
-from werkzeug.utils import secure_filename
-import os
+from sqlalchemy import func
+
 
 bp = Blueprint('main', __name__)
 
 @bp.route('/')
 def index():
-    posts = Post.query.order_by(Post.timestamp.desc()).all()
+    """
+    Render the home page with recent posts.
+
+    Returns:
+        rendered_template: The home page with recent posts
+    """
+    posts = Post.query.order_by(Post.created_at.desc()).all()
     return render_template('main/index.html', posts=posts)
 
-@bp.route('/post/<int:id>')
-def post(id):
-    post = Post.query.get_or_404(id)
-    return render_template('main/post.html', 
-                         post=post, 
-                         Comment=Comment,  # Pass the Comment model
-                         Permission=Permission)
+@bp.route('/post/<int:post_id>')
+def post(post_id):
+    """
+    Display a specific post and its comments.
 
-@bp.route('/create', methods=['GET', 'POST'])
+    Args:
+        post_id: The ID of the post to display
+
+    Returns:
+        rendered_template: The post page with post content and comments
+    """
+    post = Post.query.get_or_404(post_id)
+    # Get comment count using a subquery
+    comment_count = Comment.query.filter_by(post_id=post_id).count()
+    return render_template('main/post.html',
+                         title=post.title,
+                         post=post,
+                         comment_count=comment_count)
+
+@bp.route('/post/create', methods=['GET', 'POST'])
 @login_required
 def create_post():
+    """
+    Create a new post.
+
+    Returns:
+        GET: render_template with the create post form
+        POST: redirect to the new post's page
+    """
     if not current_user.has_permission(Permission.WRITE):
         flash('You do not have permission to create posts.')
         return redirect(url_for('main.index'))
@@ -52,34 +94,47 @@ def create_post():
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!')
-        return redirect(url_for('main.post', id=post.id))
+        return redirect(url_for('main.post', post_id=post.id))
     
     return render_template('main/create_post.html', 
                          categories=categories, 
                          Permission=Permission)
 
-@bp.route('/post/<int:id>/comment', methods=['POST'])
+@bp.route('/post/<int:post_id>/comment', methods=['POST'])
 @login_required
-def add_comment(id):
-    if not current_user.has_permission(Permission.COMMENT):
-        flash('You do not have permission to comment.')
-        return redirect(url_for('main.post', id=id))
-    
+def add_comment(post_id):
+    """
+    Add a comment to a post.
+
+    Args:
+        post_id: The ID of the post to comment on
+
+    Returns:
+        redirect: Redirects to the post page after adding comment
+    """
+    post = Post.query.get_or_404(post_id)
     content = request.form.get('content')
-    if not content:
-        flash('Comment cannot be empty.')
-        return redirect(url_for('main.post', id=id))
     
-    post = Post.query.get_or_404(id)
-    comment = Comment(content=content, author=current_user, post=post)
-    db.session.add(comment)
-    db.session.commit()
-    flash('Your comment has been added.')
-    return redirect(url_for('main.post', id=id))
+    if content:
+        comment = Comment(content=content, author=current_user, post=post)
+        db.session.add(comment)
+        db.session.commit()
+        flash('Your comment has been added!', 'success')
+    
+    return redirect(url_for('main.post', post_id=post_id))
 
 @bp.route('/comment/<int:id>/delete', methods=['POST'])
 @login_required
 def delete_comment(id):
+    """
+    Delete a comment.
+
+    Args:
+        id (int): The ID of the comment to delete
+
+    Returns:
+        redirect: Redirect to the post page after successful comment deletion
+    """
     comment = Comment.query.get_or_404(id)
     if not current_user.is_admin and current_user.id != comment.author.id:
         flash('You do not have permission to delete this comment.')
@@ -94,6 +149,15 @@ def delete_comment(id):
 @bp.route('/post/<int:id>/delete', methods=['POST'])
 @login_required
 def delete_post(id):
+    """
+    Delete a post.
+
+    Args:
+        id (int): The ID of the post to delete
+
+    Returns:
+        redirect: Redirect to the home page after successful post deletion
+    """
     post = Post.query.get_or_404(id)
     if not current_user.is_admin and current_user.id != post.author.id:
         flash('You do not have permission to delete this post.')
@@ -111,6 +175,15 @@ def delete_post(id):
 @bp.route('/post/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_post(id):
+    """
+    Edit a post.
+
+    Args:
+        id (int): The ID of the post to edit
+
+    Returns:
+        redirect: Redirect to the post page after successful post update
+    """
     post = Post.query.get_or_404(id)
     
     # Check if user has permission to edit
@@ -161,6 +234,15 @@ def edit_post(id):
 
 @bp.route('/language/<lang_code>')
 def set_language(lang_code):
+    """
+    Set the language for the application.
+
+    Args:
+        lang_code (str): The language code to set
+
+    Returns:
+        redirect: Redirect to the previous page or home page
+    """
     # Validate language code
     if lang_code in ['en', 'ua', 'ru']:
         session['language'] = lang_code

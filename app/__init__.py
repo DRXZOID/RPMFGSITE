@@ -1,10 +1,24 @@
+"""
+Application factory module.
+
+This module contains the application factory function that creates and configures
+the Flask application instance. It initializes all extensions, registers blueprints,
+and sets up the application context.
+
+Exports:
+    create_app: Factory function that returns a configured Flask application instance
+    db: SQLAlchemy database instance
+    login_manager: Flask-Login manager instance
+"""
+
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_babel import Babel
 from config import Config
-import os
+
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -13,6 +27,12 @@ login_manager.login_view = 'auth.login'
 babel = Babel()
 
 def create_app():
+    """
+    Create and configure the Flask application.
+
+    Returns:
+        Flask: A configured Flask application instance
+    """
     app = Flask(__name__)
     app.config.from_object(Config)
 
@@ -38,4 +58,4 @@ def create_app():
         # Create all tables
         db.create_all()
 
-    return app 
+    return app
