@@ -4,10 +4,10 @@
 <div class="main-container">
     <!-- Header Section -->
     <div class="page-header">
-        <h1>Bulletin Board</h1>
+        <h1>{{ _('Bulletin Board') }}</h1>
         {% if current_user.is_authenticated and current_user.has_permission(Permission.WRITE) %}
         <a href="{{ url_for('main.create_post') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Create Post
+            <i class="fas fa-plus"></i> {{ _('Create Post') }}
         </a>
         {% endif %}
     </div>
