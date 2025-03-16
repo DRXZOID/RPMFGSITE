@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Bulletin Board</h1>
+    
+    <div class="categories">
+        <h2>Categories</h2>
+        <ul>
+            {% for category in categories %}
+                <li><a href="{{ url_for('main.index', category_id=category.id) }}">{{ category.name }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="posts">
+        {% for post in posts.items %}
+            <article>
+                <h2><a href="{{ url_for('main.post', id=post.id) }}">{{ post.title }}</a></h2>
+                <p>By {{ post.author.username }} in {{ post.category.name }}</p>
+                <p>{{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+            </article>
+        {% endfor %}
+    </div>
+
+    <div class="pagination">
+        {% if posts.has_prev %}
+            <a href="{{ url_for('main.index', page=posts.prev_num) }}">Previous</a>
+        {% endif %}
+        {% if posts.has_next %}
+            <a href="{{ url_for('main.index', page=posts.next_num) }}">Next</a>
+        {% endif %}
+    </div>
+{% endblock %} 
