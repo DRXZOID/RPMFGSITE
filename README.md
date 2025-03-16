@@ -53,57 +53,67 @@ A modern, Flask-based bulletin board system with role-based permissions, multi-l
 ### Local Development
 
 1. Clone the repository:
-bash
+```bash
 git clone https://github.com/DRXZOID/RPMFGSITE
 cd RPMFGSITE
+```
 
 2. Create and activate virtual environment:
-bash
+```bash
 python -m venv venv
 source venv/bin/activate # On Windows: venv\Scripts\activate
+```
 
 3. Install dependencies:
-bash
+```bash
 pip install -r requirements.txt
+```
 
 4. Configure environment variables:
-bash
+```bash
 cp .env.example .env
+```
 
 Edit .env with your configuration
 
 5. Initialize the database:
-bash
+```bash
 flask db init
 flask db migrate
 flask db upgrade
+```
 
 6. Run the development server:
-bash
+```bash
 flask run
+```
 
 
 ### Docker Deployment
 
 1. Copy the environment file:
-bash
+```bash
 cp .env.example .env
+```
 
 
 2. Build and start the containers:
-bash
+```bash
 docker-compose up --build
+``` 
 
 
 3. Initialize the database:
-bash
+```bash
 docker-compose exec app flask db init
 docker-compose exec app flask db migrate
 docker-compose exec app flask db upgrade
+```
 
 4. Create an admin user:
-bash
+```bash
 docker-compose exec web flask create-admin
+```
 
 
 
@@ -112,60 +122,69 @@ docker-compose exec web flask create-admin
 ### SQLite (Default)
 
 1. Create a SQLite database file:
-bash
+```bash
 touch app/data-dev.db
+```
 
 2. Update the database URI in .env:
+```bash
 DATABASE_URI=sqlite:///app/data-dev.db
+```
 
 
 ### MySQL
 
 1. Create a MySQL database:
+```
 DB_TYPE=mysql
 DB_USER=your_username
 DB_PASSWORD=your_password
 DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=bulletin
-
+```
 
 ### PostgreSQL
+```
 DB_TYPE=postgresql
 DB_USER=your_username
 DB_PASSWORD=your_password
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=bulletin
+```
 
 
 ## Translation Management
 
 ### Extract Messages
-bash
+```bash
 pybabel extract -F babel.cfg -o messages.pot .
+```
 
 ### Update Translations
-bash
+```bash
 pybabel update -i messages.pot -d app/translations
+```
 
 ### Compile Translations
-bash
+```bash
 pybabel compile -d app/translations
-
+```
 
 ### Create New Language
-bash
+```bash
 pybabel init -i messages.pot -d app/translations -l new_language
-
+```
 
 ### Compile Translations
-
-bash
+```bash
 pybabel compile -d app/translations
+```
 
 ## Project Structure
 
+```
 bulletin-board/
 ├── app/
 │ ├── init.py
@@ -195,6 +214,7 @@ bulletin-board/
 ├── Dockerfile
 ├── requirements.txt
 └── run.py
+```
 
 
 ## User Roles and Permissions
@@ -217,9 +237,10 @@ bulletin-board/
 
 
 ### Database Migrations
-bash
+```bash
 flask db migrate -m "Migration message"
 flask db upgrade
+``` 
 
 
 ### Code Style
