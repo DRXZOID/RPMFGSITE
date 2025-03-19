@@ -14,14 +14,40 @@ class Role(db.Model):
     users = db.relationship('User', backref='role', lazy='dynamic')
 
 class User(UserMixin, db.Model):
+    """
+    User model for storing user account information.
+    
+    Attributes:
+        id: Primary key
+        username: User's display name
+        email: User's email address
+        password_hash: Hashed password
+        bio: User's biography or description
+        avatar: Profile picture filename
+        location: User's location
+        website: User's personal website
+        newsletter_subscription: Newsletter opt-in status
+        created_at: Account creation timestamp
+        updated_at: Last update timestamp
+    """
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
+    
+    # New profile fields
+    bio = db.Column(db.Text)
+    avatar = db.Column(db.String(20))
+    location = db.Column(db.String(100))
+    website = db.Column(db.String(200))
+    newsletter_subscription = db.Column(db.Boolean, default=False)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
     is_admin = db.Column(db.Boolean, default=False)
     active = db.Column(db.Boolean, default=True)
-    avatar = db.Column(db.String(200))
-    bio = db.Column(db.Text)
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
     posts = db.relationship('Post', backref='author', lazy=True)
     comments = db.relationship('Comment', backref='author', lazy=True)
