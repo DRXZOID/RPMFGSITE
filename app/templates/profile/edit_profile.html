@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Edit Profile</h1>
+    
+    <form method="POST" action="{{ url_for('profile.edit_profile') }}" enctype="multipart/form-data" class="mt-4">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group mb-3">
+            <label for="username">Username</label>
+            {{ form.username(class="form-control", placeholder="Username") }}
+            {% if form.username.errors %}
+                {% for error in form.username.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="email">Email</label>
+            {{ form.email(class="form-control", placeholder="Email") }}
+            {% if form.email.errors %}
+                {% for error in form.email.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="bio">Bio</label>
+            {{ form.bio(class="form-control", rows="4", placeholder="Tell us about yourself...") }}
+            {% if form.bio.errors %}
+                {% for error in form.bio.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="avatar">Profile Picture</label>
+            {{ form.avatar(class="form-control") }}
+            {% if form.avatar.errors %}
+                {% for error in form.avatar.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+            {% if current_user.avatar %}
+                <img src="{{ url_for('static', filename='avatars/' + current_user.avatar) }}" 
+                     class="mt-2" alt="Current avatar" style="max-width: 100px;">
+            {% endif %}
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="location">Location</label>
+            {{ form.location(class="form-control", placeholder="Your location") }}
+            {% if form.location.errors %}
+                {% for error in form.location.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="website">Website</label>
+            {{ form.website(class="form-control", placeholder="Your website URL") }}
+            {% if form.website.errors %}
+                {% for error in form.website.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="form-check mb-3">
+            {{ form.newsletter_subscription(class="form-check-input") }}
+            <label class="form-check-label" for="newsletter_subscription">
+                Subscribe to newsletter
+            </label>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{{ url_for('profile.view_profile') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %} 

@@ -17,6 +17,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from app.models import db, User
 from app import create_app
+from app.forms import EditProfileForm
 
 bp = Blueprint('profile', __name__, url_prefix='/profile')
 
@@ -40,28 +41,33 @@ def view_profile():
 @bp.route('/edit', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
-    """
-    Handle profile editing.
-
-    Returns:
-        rendered_template: Profile edit form on GET, redirects on successful POST
-    """
-    if request.method == 'POST':
-        current_user.bio = request.form.get('bio')
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        if form.avatar.data:
+            # Handle avatar upload
+            picture_file = save_picture(form.avatar.data)
+            current_user.avatar = picture_file
+            
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        current_user.bio = form.bio.data
+        current_user.location = form.location.data
+        current_user.website = form.website.data
+        current_user.newsletter_subscription = form.newsletter_subscription.data
         
-        if 'avatar' in request.files:
-            file = request.files['avatar']
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file_path = os.path.join(create_app().config['UPLOAD_FOLDER'], filename)
-                file.save(file_path)
-                current_user.avatar = filename
-
         db.session.commit()
-        flash('Your profile has been updated.')
+        flash('Your profile has been updated!', 'success')
         return redirect(url_for('profile.view_profile'))
     
-    return render_template('profile/edit.html')
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+        form.bio.data = current_user.bio
+        form.location.data = current_user.location
+        form.website.data = current_user.website
+        form.newsletter_subscription.data = current_user.newsletter_subscription
+    
+    return render_template('profile/edit_profile.html', form=form)
 
 @bp.route('/<username>')
 def view_profile_other(username):
@@ -74,5 +80,19 @@ def account_settings():
     # This route is not implemented in the original file or the new docstring
     # It's assumed to exist as it's called in the edit_profile route
     pass
+
+@bp.route('/profile/delete', methods=['POST'])
+@login_required
+def delete_account():
+    # Delete user's avatar file if it exists
+    if current_user.avatar:
+        avatar_path = os.path.join(current_app.root_path, 'static/avatars', current_user.avatar)
+        if os.path.exists(avatar_path):
+            os.remove(avatar_path)
+    
+    db.session.delete(current_user)
+    db.session.commit()
+    flash('Your account has been deleted.', 'info')
+    return redirect(url_for('main.index'))
 
 # Add similar docstrings for other routes... 
