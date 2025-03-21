@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, TextAreaField, BooleanField, URLField
+from wtforms import StringField, TextAreaField, BooleanField, URLField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, URL, Optional
 
 # ... existing forms ...
@@ -30,4 +30,13 @@ class EditProfileForm(FlaskForm):
                          validators=[Optional(), Length(max=100)])
     website = URLField('Website', 
                       validators=[Optional(), URL()])
-    newsletter_subscription = BooleanField('Subscribe to Newsletter') 
+    newsletter_subscription = BooleanField('Subscribe to Newsletter')
+
+class NewsForm(FlaskForm):
+    """
+    Form for creating and editing news articles.
+    """
+    title = StringField('Title', validators=[DataRequired(), Length(min=3, max=200)])
+    content = TextAreaField('Content', validators=[DataRequired()])
+    subject = StringField('Subject', validators=[DataRequired(), Length(max=100)])
+    submit = SubmitField('Submit') 

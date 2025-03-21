@@ -19,7 +19,7 @@ from flask_migrate import Migrate
 from flask_babel import Babel
 from config import Config
 
-
+# Create extensions instances first
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
@@ -49,11 +49,12 @@ def create_app():
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
     with app.app_context():
-        from app.routes import auth, main, admin, profile
+        from app.routes import auth, main, admin, profile, news
         app.register_blueprint(auth.bp)
         app.register_blueprint(main.bp)
         app.register_blueprint(admin.bp)
         app.register_blueprint(profile.bp)
+        app.register_blueprint(news.bp)
 
         # Create all tables
         db.create_all()

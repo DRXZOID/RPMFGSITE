@@ -9,6 +9,7 @@
 <body>
     <nav>
         <a href="{{ url_for('main.index') }}">Home</a>
+        <a href="{{ url_for('news.index') }}">News</a>
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('main.create_post') }}">Create Post</a>
             {% if current_user.is_admin %}
