@@ -1,3 +1,6 @@
+"""
+Database models module.
+"""
 from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -193,4 +196,28 @@ class Activity(db.Model):
     details = db.Column(db.String(256))
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship('User', backref='activities') 
+    user = db.relationship('User', backref='activities')
+
+class News(db.Model):
+    """
+    News model for storing news articles.
+    
+    Attributes:
+        id: Primary key
+        title: News article title
+        content: Main content of the news article
+        subject: Subject/category of the news
+        author_id: ID of the user who created the news
+        created_at: Timestamp of creation
+        updated_at: Timestamp of last update
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    subject = db.Column(db.String(100), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationship
+    author = db.relationship('User', backref='news_articles') 
