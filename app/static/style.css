@@ -16,7 +16,7 @@ body {
 .navbar {
     background: #ffffff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: fixed;
+        position: static;
     top: 0;
     left: 0;
     right: 0;
@@ -88,7 +88,7 @@ body {
 
 /* Main Content */
 .main-content {
-    margin-top: 80px;
+    margin-top: 20px;
     padding: 20px;
     max-width: 1200px;
     margin-left: auto;
