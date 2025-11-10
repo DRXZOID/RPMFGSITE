@@ -61,13 +61,15 @@
 }
 
 .btn-primary {
-    background-color: #4a90e2;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
     color: white;
     width: 100%;
 }
 
 .btn-primary:hover {
-    background-color: #357abd;
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
 }
 
 .auth-links {
@@ -953,12 +955,14 @@
 }
 
 .btn-primary {
-    background-color: #1976d2;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
     color: white;
 }
 
 .btn-primary:hover {
-    background-color: #1565c0;
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
 }
 
 .btn-secondary {
@@ -1250,4 +1254,66 @@
         text-align: center;
         margin: 1rem 0;
     }
-} 
+}
+
+/* Общие стили */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Arial', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    color: #333;
+}
+
+a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Карточки */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Кнопки */
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Формы */
+.form-control {
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Шапка */
+.navbar {
+    margin-bottom: 1rem;
+}
+
+/* Подвал */
+footer {
+    background-color: #343a40;
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: 2rem;
+}

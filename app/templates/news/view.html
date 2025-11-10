@@ -1,40 +1,40 @@
 {% extends "base.html" %}
 
+{% block title %}News - {{ news.title }}{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <article>
-        <h1>{{ news.title }}</h1>
-        <div class="text-muted mb-4">
-            <span>By {{ news.author.username }}</span> |
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h1 class="card-title">{{ news.title }}</h1>
+        <div class="text-muted">
+            <span>By <strong>{{ news.author.username }}</strong></span> |
             <span>{{ news.created_at.strftime('%Y-%m-%d') }}</span> |
             <span>Subject: {{ news.subject }}</span>
         </div>
-
-        <div class="content mb-4">
-            {{ news.content }}
-        </div>
-
-        {% if current_user == news.author %}
-        <div class="btn-group">
-            <a href="{{ url_for('news.edit', news_id=news.id) }}" class="btn btn-primary">Edit</a>
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                Delete
-            </button>
-        </div>
-        {% endif %}
-    </article>
+    </div>
+    <div class="card-body">
+        <p class="card-text">{{ news.content }}</p>
+    </div>
+    {% if current_user.is_authenticated and (current_user.role == 'admin' or current_user == news.author) %}
+    <div class="card-footer d-flex justify-content-end">
+        <a href="{{ url_for('news.edit', news_id=news.id) }}" class="btn btn-outline-primary me-2">Edit</a>
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            Delete
+        </button>
+    </div>
+    {% endif %}
 </div>
 
 <!-- Delete Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title">Delete News Article</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this news article?
+                <p>Are you sure you want to delete this news article?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -45,4 +45,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}
