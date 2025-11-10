@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="main-container">
+<div class="forum-container">
     <!-- Header Section -->
-    <div class="page-header">
-        <h1>{{ _('Bulletin Board') }}</h1>
+    <div class="forum-header">
         {% if current_user.is_authenticated and current_user.has_permission(Permission.WRITE) %}
-        <a href="{{ url_for('main.create_post') }}" class="btn btn-primary">
+        <a href="{{ url_for('main.create_post') }}" class="create-topic-btn">
             <i class="fas fa-plus"></i> {{ _('Create Post') }}
         </a>
         {% endif %}
